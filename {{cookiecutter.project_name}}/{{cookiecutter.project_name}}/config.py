@@ -59,15 +59,6 @@ class Settings(BaseSettings):
     LOG_DIR: str = os.sep.join(["logs", f"{current_timestamp}-rem.log"])
     SYSLOG_ADDR: Optional[str] = None
 
-    # Scraping settings
-    DATA_FILE_NAME: str = f"{current_timestamp}-data"
-    DATA_DIRECTORY: str = "data"
-    USE_GCP: bool = False
-    GCP_API_KEY: str
-    SAVE_TO_FILE: bool = True
-    OFFSET: float = 0
-    USE_CACHE: bool = True
-
     class Config:
         env_file = ".env"
         env_file_encoding = 'utf-8'
