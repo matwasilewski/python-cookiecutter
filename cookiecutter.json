@@ -1,5 +1,5 @@
 {
-  "project_name": "mw-python-cookiecutter",
+  "project_name": "python-cookiecutter",
   "package_name": "{{ cookiecutter.project_name.replace('-', '_') }}",
   "author": "Mateusz Wasilewski",
   "email": "mat.p.wasilewski@gmail.com",
