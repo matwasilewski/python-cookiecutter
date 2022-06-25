@@ -56,7 +56,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "info"
     VERBOSE_LOGS: Union[bool, int, str] = True
     JSON_LOGS: Union[bool, int, str] = False
-    LOG_DIR: str = os.sep.join(["logs", f"{current_timestamp}-rem.log"])
+    LOG_DIR: str = os.sep.join(["logs", f"{current_timestamp}-{LOGGER_NAME}-{LOG_LEVEL}.log"])
     SYSLOG_ADDR: Optional[str] = None
 
     class Config:
