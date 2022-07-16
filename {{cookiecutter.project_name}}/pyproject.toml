@@ -5,10 +5,9 @@ authors = ["{{cookiecutter.version}} <{{cookiecutter.email}}>"]
 description = "{{cookiecutter.description}}"
 
 [tool.poetry.dependencies]
-python = "^3.10.4"
+python = "^3.7"
 JSON-log-formatter = "0.4.0"
 ujson = "4.3.0"
-neomodel = "4.0.7"
 pyjwt = "2.3.0"
 types-python-slugify = "5.0.2"
 types-ujson = "4.2.0"
@@ -40,9 +39,6 @@ force_grid_wrap = 0
 line_length = 79
 use_parentheses = true
 ensure_newline_before_comments = true
-
-[tool.pytest.ini_options]
-addopts = "--cov=boireplate"
 
 [tool.flakehell]
 extended_default_ignore = []
