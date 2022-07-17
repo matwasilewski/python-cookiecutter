@@ -1,0 +1,8 @@
+[flake8]
+extend-ignore = W503,Q000
+exclude = README.md
+format = colored
+max_line_length = 79
+show_source = true
+
+
