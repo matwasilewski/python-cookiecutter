@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     DESCRIPTION: str = str(PKG_META['description'])
 
     # Logger
-    LOGGER_NAME: str = "rem"
+    LOGGER_NAME: str = "{{cookiecutter.package_name}}"
     LOG_LEVEL: str = "info"
     VERBOSE_LOGS: Union[bool, int, str] = True
     JSON_LOGS: Union[bool, int, str] = False
