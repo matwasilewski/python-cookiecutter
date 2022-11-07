@@ -1,4 +1,4 @@
-class BadLogFormatException(Exception):
+class BadLogFormatError(Exception):
     pass
 
 
@@ -10,15 +10,15 @@ class InvalidChoiceError(Exception):
     pass
 
 
-class CannotUpdateFieldException(Exception):
+class CannotUpdateFieldError(Exception):
     pass
 
 
-class UnrecognisedFieldException(Exception):
+class UnrecognisedFieldError(Exception):
     pass
 
 
-class InsufficientInformationException(Exception):
+class InsufficientInformationError(Exception):
     pass
 
 
@@ -30,11 +30,11 @@ class NoManualApprovalError(Exception):
     pass
 
 
-class InvalidQueryException(Exception):
+class InvalidQueryError(Exception):
     pass
 
 
-class EmptyGraphListException(Exception):
+class EmptyGraphListError(Exception):
     pass
 
 
@@ -42,11 +42,11 @@ class InvalidBfsRunDetected(Exception):
     pass
 
 
-class CyclicGraphException(Exception):
+class CyclicGraphError(Exception):
     pass
 
 
-class InvalidParametersException(Exception):
+class InvalidParametersError(Exception):
     pass
 
 
@@ -54,9 +54,9 @@ class FlowCalculationError(Exception):
     pass
 
 
-class NoPathsFoundException(Exception):
+class NoPathsFoundError(Exception):
     pass
 
 
-class BadOperatorException(Exception):
+class BadOperatorError(Exception):
     pass
