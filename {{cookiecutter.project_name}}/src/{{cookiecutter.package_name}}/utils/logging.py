@@ -9,7 +9,7 @@ from typing import Optional
 import ujson
 from json_log_formatter import JSONFormatter
 
-from .exceptions import BadLogFormatException
+from .exceptions import BadLogFormatError
 
 GREY = "\x1b[38;21m"
 RED = "\x1b[31;21m"
@@ -37,7 +37,7 @@ class ColourfulFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         _log_fmt = self.FORMATS.get(record.levelno)
         if not _log_fmt:
-            raise BadLogFormatException
+            raise BadLogFormatError
         log_fmt = _log_fmt.format(self._fmt)
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
