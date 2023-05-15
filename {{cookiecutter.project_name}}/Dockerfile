@@ -22,9 +22,6 @@ RUN pip install -r requirements.txt --extra-index-url $PACKAGE_REPO_URL
 # copy the rest of the source code
 COPY . /app
 
-# expose {{cookiecutter.app_name}} port
-# EXPOSE ${{cookiecutter.app_name}}_PORT
-
 # run uvicorn
 CMD poetry show
 # FIXME: run CMD here...
