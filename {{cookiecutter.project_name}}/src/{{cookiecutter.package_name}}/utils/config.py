@@ -43,6 +43,7 @@ class Settings(BaseSettings):
     Settings. Environment variables always take priority over values loaded
     from the dotenv file.
     """
+
     current_timestamp = int(time.time())
 
     # Meta
@@ -56,7 +57,9 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "info"
     VERBOSE_LOGS: Union[bool, int, str] = True
     JSON_LOGS: Union[bool, int, str] = False
-    LOG_DIR: str = os.sep.join(["logs", f"{current_timestamp}-{LOGGER_NAME}-{LOG_LEVEL}.log"])
+    LOG_DIR: str = os.sep.join(
+        ["logs", f"{current_timestamp}-{LOGGER_NAME}-{LOG_LEVEL}.log"]
+    )
     SYSLOG_ADDR: Optional[str] = None
 
     class Config:
