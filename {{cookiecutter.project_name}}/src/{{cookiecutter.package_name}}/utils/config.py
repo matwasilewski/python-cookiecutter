@@ -1,12 +1,13 @@
-import datetime
-import os
 import time
 from functools import lru_cache
-from typing import Dict, Optional, Union
+from typing import Optional, Union
 
-import pkg_resources
+from pydantic import BaseSettings
+import os
+from importlib import metadata
+from typing import Dict
+
 import tomlkit
-from pydantic import BaseSettings, validator
 
 
 def _get_project_meta(name: str = 'unknown') -> Dict:
@@ -24,13 +25,13 @@ def _get_project_meta(name: str = 'unknown') -> Dict:
         description = parsed.get('description', '')
     except FileNotFoundError:
         # If cannot read the contents of pyproject directly (i.e. in Docker),
-        # check installed package (there is a risk that this could be stale
-        # though):
+        # check installed package using importlib.metadata:
         try:
-            distribution = pkg_resources.get_distribution(name)
-            name = distribution.project_name
-            version = distribution.version
-        except pkg_resources.DistributionNotFound:
+            dist = metadata.distribution(name)
+            name = dist.metadata['Name']
+            version = dist.version
+            description = dist.metadata.get('Summary', '')
+        except metadata.PackageNotFoundError:
             pass
     return {"name": name, "version": version, "description": description}
 
