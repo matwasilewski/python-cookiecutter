@@ -54,19 +54,19 @@ class CustomisedJSONFormatter(JSONFormatter):
         extra: dict,
         record: logging.LogRecord,
     ) -> dict:
-        extra['message'] = message
+        extra["message"] = message
 
         # Include builtins
-        extra['level'] = record.levelname
-        extra['name'] = record.name
-        extra['pathname'] = record.pathname
-        extra['lineno'] = record.lineno
+        extra["level"] = record.levelname
+        extra["name"] = record.name
+        extra["pathname"] = record.pathname
+        extra["lineno"] = record.lineno
 
-        if 'time' not in extra:
-            extra['time'] = datetime.datetime.now()
+        if "time" not in extra:
+            extra["time"] = datetime.datetime.now()
 
         if record.exc_info:
-            extra['exc_info'] = self.formatException(record.exc_info)
+            extra["exc_info"] = self.formatException(record.exc_info)
         return extra
 
 
@@ -77,17 +77,17 @@ class CustomisedVerboseJSONFormatter(CustomisedJSONFormatter):
         extra: dict,
         record: logging.LogRecord,
     ) -> dict:
-        extra['funcName'] = record.funcName
-        extra['module'] = record.module
-        extra['pathname'] = record.pathname
-        extra['process'] = record.process
-        extra['processName'] = record.processName
-        if hasattr(record, 'stack_info'):
-            extra['stack_info'] = record.stack_info
+        extra["funcName"] = record.funcName
+        extra["module"] = record.module
+        extra["pathname"] = record.pathname
+        extra["process"] = record.process
+        extra["processName"] = record.processName
+        if hasattr(record, "stack_info"):
+            extra["stack_info"] = record.stack_info
         else:
-            extra['stack_info'] = None
-        extra['thread'] = record.thread
-        extra['threadName'] = record.threadName
+            extra["stack_info"] = None
+        extra["thread"] = record.thread
+        extra["threadName"] = record.threadName
         return super(CustomisedVerboseJSONFormatter, self).json_record(
             message,
             extra,

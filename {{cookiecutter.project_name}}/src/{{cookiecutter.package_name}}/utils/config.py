@@ -10,27 +10,27 @@ from typing import Dict
 import tomlkit
 
 
-def _get_project_meta(name: str = 'unknown') -> Dict:
+def _get_project_meta(name: str = "unknown") -> Dict:
     """
     Get name and version from pyproject metadata.
     """
     version = "unknown"
     description = ""
     try:
-        with open('./pyproject.toml') as pyproject:
+        with open("./pyproject.toml") as pyproject:
             file_contents = pyproject.read()
-        parsed = dict(tomlkit.parse(file_contents))['tool']['poetry']
-        name = parsed['name']
-        version = parsed.get('version', 'unknown')
-        description = parsed.get('description', '')
+        parsed = dict(tomlkit.parse(file_contents))["tool"]["poetry"]
+        name = parsed["name"]
+        version = parsed.get("version", "unknown")
+        description = parsed.get("description", "")
     except FileNotFoundError:
         # If cannot read the contents of pyproject directly (i.e. in Docker),
         # check installed package using importlib.metadata:
         try:
             dist = metadata.distribution(name)
-            name = dist.metadata['Name']
+            name = dist.metadata["Name"]
             version = dist.version
-            description = dist.metadata.get('Summary', '')
+            description = dist.metadata.get("Summary", "")
         except metadata.PackageNotFoundError:
             pass
     return {"name": name, "version": version, "description": description}
@@ -48,10 +48,10 @@ class Settings(BaseSettings):
     current_timestamp = int(time.time())
 
     # Meta
-    APP_NAME: str = str(PKG_META['name'])
-    APP_VERSION: str = str(PKG_META['version'])
+    APP_NAME: str = str(PKG_META["name"])
+    APP_VERSION: str = str(PKG_META["version"])
     PUBLIC_NAME: str = APP_NAME
-    DESCRIPTION: str = str(PKG_META['description'])
+    DESCRIPTION: str = str(PKG_META["description"])
 
     # Logger
     LOGGER_NAME: str = "{{cookiecutter.package_name}}"
@@ -65,7 +65,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
-        env_file_encoding = 'utf-8'
+        env_file_encoding = "utf-8"
         case_sensitive = True
         secrets_dir = "secrets"
 
