@@ -1,8 +1,11 @@
 import os
+from pathlib import Path
 
 import pytest
 
 
-@pytest.fixture()
-def test_resources_root() -> str:
-    return os.path.join(f"{os.path.dirname(__file__)}", "tests", "resources")
+@pytest.fixture(scope="session")
+def test_resources_root() -> Path:
+    return Path(__file__).parent / "tests" / "resources"
+
+

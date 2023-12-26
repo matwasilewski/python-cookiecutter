@@ -4,8 +4,8 @@ version = "{{cookiecutter.version}}"
 authors = ["{{cookiecutter.version}} <{{cookiecutter.email}}>"]
 description = "{{cookiecutter.description}}"
 packages = [
-    { include = "src" },
-    { include = "src/**/*.py" },
+    { include = "{{cookiecutter.project_name}}" },
+    { include = "{{cookiecutter.project_name}}/**/*.py" },
 ]
 
 [tool.poetry.dependencies]
