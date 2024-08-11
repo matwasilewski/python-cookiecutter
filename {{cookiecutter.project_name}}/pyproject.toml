@@ -5,7 +5,6 @@ authors = ["{{cookiecutter.version}} <{{cookiecutter.email}}>"]
 description = "{{cookiecutter.description}}"
 packages = [
     { include = "{{cookiecutter.project_name}}" },
-    { include = "{{cookiecutter.project_name}}/**/*.py" },
 ]
 
 [tool.poetry.dependencies]
