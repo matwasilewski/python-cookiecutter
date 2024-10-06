@@ -1,1 +1,2 @@
 .idea/
+{{cookiecutter.project_name}}/.venv/
