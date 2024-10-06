@@ -1,9 +1,6 @@
-.PHONY: help check-bootstrap-dependencies check-poetry check-tools check-docker bootstrap setup install update format poetry-check lint-check format-check type-check lint unit unit-coverage gcp-authenticate
+.PHONY: help check-bootstrap-dependencies check-uv check-tools check-docker bootstrap setup install update format poetry-check lint-check format-check type-check lint unit unit-coverage gcp-authenticate
 
-POETRY_VERSION?=1.6
 PYTHON_VERSION?=$(shell cat .python-version | tr -d '[:space:]')
-NEXT_POETRY_VERSION:=$(shell echo $(POETRY_VERSION) | awk -F. '{print $$1 "." $$2+1}')
-POETRY?=poetry@$(POETRY_VERSION)
 VENV?=.venv
 VENV_ACTIVATE=$(VENV)/bin/activate
 
@@ -17,13 +14,9 @@ help:
 
 # check-bootstrap-dependencies: Check if bootstrap dependencies are installed
 check-bootstrap-dependencies:
-	@which pyenv >/dev/null || (echo $(RED)"Error: pyenv not found install this https://github.com/pyenv/pyenv and then do: make bootstrap"$(NC); exit 1)
+	@which uv >/dev/null || (echo $(RED)"Error: uv not found. Install from https://github.com/astral-sh/uv and then do: make bootstrap"$(NC); exit 1)
 	@which pipx >/dev/null || (echo $(RED)"Error: pipx not found https://pypa.github.io/pipx/installation/"$(NC); exit 1)
-
-# check-poetry: Check if poetry is installed
-check-poetry:
-	@which $(POETRY) >/dev/null || (echo $(RED)"Error: $(POETRY) not found, try doing: make setup"$(NC); exit 1)
-
+	
 check-tools:
 	@which gcloud > /dev/null || (echo $(RED)"Error: gcloud is not installed. Please install it from https://cloud.google.com/sdk/docs/quickstarts"$(NC); exit 1)
 	@which gsutil > /dev/null || (echo $(RED)"Error: gsutil is not installed. Please install it from https://cloud.google.com/storage/docs/gsutil_install"$(NC); exit 1)
@@ -39,22 +32,16 @@ check-docker:
 
 ## bootstrap: Install Python version and pipx
 bootstrap:
-	pyenv install $(PYTHON_VERSION)
-	pyenv local $(PYTHON_VERSION)
+	uv python install
 	pip install --user pipx # installing pipx for external applications
 	pipx ensurepath
 
-## setup: Install poetry
-setup: check-bootstrap-dependencies
-	pipx install --suffix="@$(POETRY_VERSION)" "poetry>=$(POETRY_VERSION),<$(NEXT_POETRY_VERSION)"
-
 $(VENV_ACTIVATE):
-	$(POETRY) self add poetry-pre-commit-plugin
-	$(POETRY) install --no-root
-	$(POETRY) run pre-commit install -t pre-push
+	uv venv --python-preference='only-managed'
+	uv self add poetry-pre-commit-plugin
 
 install: $(VENV_ACTIVATE)
-	$(POETRY) install --no-root --sync
+	$(POETRY) install
 
 update: $(VENV_ACTIVATE)
 	$(POETRY) lock
