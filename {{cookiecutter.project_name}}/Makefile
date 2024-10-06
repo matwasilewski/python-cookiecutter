@@ -1,4 +1,4 @@
-.PHONY: help install-precommit-hooks check-bootstrap-dependencies check-uv check-tools check-docker bootstrap setup install update format poetry-check lint-check format-check type-check lint unit unit-coverage gcp-authenticate
+.PHONY: help check-bootstrap-dependencies check-tools check-docker bootstrap precommit install format type-check unit gcp-authenticate
 
 PYTHON_VERSION?=$(shell cat .python-version | tr -d '[:space:]')
 VENV?=.venv
@@ -19,6 +19,7 @@ check-bootstrap-dependencies:
 	@which uv >/dev/null || (echo $(RED)"Error: uv not found. Install from https://github.com/astral-sh/uv and then do: make bootstrap"$(NC); exit 1)
 	@echo "uv is installed!"
 
+## check-tools: Check if required tools are installed
 check-tools:
 	@which gcloud > /dev/null || (echo $(RED)"Error: gcloud is not installed. Please install it from https://cloud.google.com/sdk/docs/quickstarts"$(NC); exit 1)
 	@echo "gcloud is installed!"
@@ -28,81 +29,58 @@ check-tools:
 	@echo "docker is installed!"
 	@echo "All prerequisites are installed."
 
+## check-docker: Check if Docker CLI is available
 check-docker:
 	@echo "Checking if Docker CLI is available..."
 	@which docker > /dev/null || (echo "Docker CLI not found. Please install Docker https://www.docker.com/get-started/"$(NC); exit 1;)
 	@echo "Docker CLI is available."
-	@echo "Checking if Docker is running..."
-	@docker ps > /dev/null 2>&1 || (echo $(RED)"Error: Docker is not running. Please start the Docker daemon."$(NC); exit 1;)
-	@echo "Docker is running."
 
-bootstrap:
-	uv python install --python-preference='only-managed' $(PYTHON_VERSION)	
+## bootstrap: Install Python version and pipx
+bootstrap: check-bootstrap-dependencies check-tools check-docker
+	uv python install --python-preference='only-managed' $(PYTHON_VERSION)
 	@echo "Python $(PYTHON_VERSION) is installed!"
 
-$(VENV_ACTIVATE):
+## $(VENV_ACTIVATE): Create a virtual environment
+$(VENV_ACTIVATE): check-bootstrap-dependencies
 	uv venv --python-preference='only-managed'
 	$(PYTHON) -m ensurepip --upgrade
 	$(PYTHON) -m pip install --upgrade pip
 	@echo "pip is installed!"
-	
-install-precommit-hooks: $(VENV_ACTIVATE)
+
+## .git/hooks/pre-commit: Install pre-commit hooks
+.git/hooks/pre-commit: $(VENV_ACTIVATE)
 	$(PIP) install pre-commit
 	$(VENV)/bin/pre-commit install --install-hooks
 	@echo "pre-commit is installed!"
 
-precommit: precommit-hooks
+## precommit: Run pre-commit hooks
+precommit: .git/hooks/pre-commit
 	git fetch origin
 	$(VENV)/bin/pre-commit run -s origin/main -o HEAD
-	
+
+## install: Install dependencies
 install: $(VENV_ACTIVATE)
 	@echo "Installing dependencies..."
-	uv pip compile pyproject.toml -o requirements.txt	
+	uv pip compile pyproject.toml -o requirements.txt
 	$(PIP) install -r requirements.txt
 	@echo "Dependencies installed!"
 
-# TODO: Fix this
-update: $(VENV_ACTIVATE)
-	uv lock
-	uv install --no-root
-	@echo "Dependencies updated!"
-	@echo "Dont forget to commit the updated lock file"
-
+## format: Format code
 format: $(VENV_ACTIVATE)
 	$(VENV)/bin/ruff check --fix --exit-zero .
+	$(VENV)/bin/ruff check --select I --fix
 	$(VENV)/bin/ruff format .
 	@echo "Code formatted!"
 
-# TODO: Fix this
-lint-check: $(VENV_ACTIVATE)
-	$(POETRY) run ruff check .
-
-# TODO: Fix this
-format-check: $(VENV_ACTIVATE)
-	$(POETRY) run ruff format --check .
-
-# TODO: Fix this
+## type-check: Type check code with mypy
 type-check:
-	$(POETRY) run mypy .
-
-## lint: Run all lint checks
-# TODO: Fix this
-lint: poetry-check lint-check format-check type-check
+	$(VENV)/bin/mypy .
 
 ## unit: Run unit tests
-# TODO: Fix this
 unit: $(VENV_ACTIVATE)
-	$(POETRY) run pytest tests/unit
-
-## unit-coverage: Run unit tests with coverage report
-# TODO: Fix this
-unit-coverage: $(VENV_ACTIVATE)
-	$(POETRY) run coverage run -m pytest tests/unit
-	$(POETRY) run coverage report
-	$(POETRY) run coverage html
+	$(VENV)/bin/pytest tests/unit
 
 ## gcp-authenticate: Authenticate with GCP, use this before running composer commands
 gcp-authenticate:
 	gcloud auth application-default login
 	gcloud auth login
-
