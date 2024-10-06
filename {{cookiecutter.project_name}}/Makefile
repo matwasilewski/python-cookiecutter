@@ -1,8 +1,10 @@
-.PHONY: help check-bootstrap-dependencies check-uv check-tools check-docker bootstrap setup install update format poetry-check lint-check format-check type-check lint unit unit-coverage gcp-authenticate
+.PHONY: help install-precommit-hooks check-bootstrap-dependencies check-uv check-tools check-docker bootstrap setup install update format poetry-check lint-check format-check type-check lint unit unit-coverage gcp-authenticate
 
 PYTHON_VERSION?=$(shell cat .python-version | tr -d '[:space:]')
 VENV?=.venv
 VENV_ACTIVATE=$(VENV)/bin/activate
+PYTHON=$(VENV)/bin/python
+PIP = $(VENV)/bin/pip
 
 RED="\033[0;31m"
 CYAN="\033[36m"
@@ -15,12 +17,16 @@ help:
 # check-bootstrap-dependencies: Check if bootstrap dependencies are installed
 check-bootstrap-dependencies:
 	@which uv >/dev/null || (echo $(RED)"Error: uv not found. Install from https://github.com/astral-sh/uv and then do: make bootstrap"$(NC); exit 1)
-	@which pipx >/dev/null || (echo $(RED)"Error: pipx not found https://pypa.github.io/pipx/installation/"$(NC); exit 1)
-	
+	@echo "uv is installed!"
+
 check-tools:
 	@which gcloud > /dev/null || (echo $(RED)"Error: gcloud is not installed. Please install it from https://cloud.google.com/sdk/docs/quickstarts"$(NC); exit 1)
+	@echo "gcloud is installed!"
 	@which gsutil > /dev/null || (echo $(RED)"Error: gsutil is not installed. Please install it from https://cloud.google.com/storage/docs/gsutil_install"$(NC); exit 1)
+	@echo "gsutil is installed!"
 	@which docker > /dev/null || (echo $(RED)"Error: docker is not installed. Please install this and ensure its running"$(NC); exit 1)
+	@echo "docker is installed!"
+	@echo "All prerequisites are installed."
 
 check-docker:
 	@echo "Checking if Docker CLI is available..."
@@ -30,48 +36,66 @@ check-docker:
 	@docker ps > /dev/null 2>&1 || (echo $(RED)"Error: Docker is not running. Please start the Docker daemon."$(NC); exit 1;)
 	@echo "Docker is running."
 
-## bootstrap: Install Python version and pipx
 bootstrap:
-	uv python install
-	pip install --user pipx # installing pipx for external applications
-	pipx ensurepath
+	uv python install --python-preference='only-managed' $(PYTHON_VERSION)	
+	@echo "Python $(PYTHON_VERSION) is installed!"
 
 $(VENV_ACTIVATE):
 	uv venv --python-preference='only-managed'
-	uv self add poetry-pre-commit-plugin
+	$(PYTHON) -m ensurepip --upgrade
+	$(PYTHON) -m pip install --upgrade pip
+	@echo "pip is installed!"
+	
+install-precommit-hooks: $(VENV_ACTIVATE)
+	$(PIP) install pre-commit
+	$(VENV)/bin/pre-commit install --install-hooks
+	@echo "pre-commit is installed!"
 
+precommit: precommit-hooks
+	git fetch origin
+	$(VENV)/bin/pre-commit run -s origin/main -o HEAD
+	
 install: $(VENV_ACTIVATE)
-	$(POETRY) install
+	@echo "Installing dependencies..."
+	uv pip compile pyproject.toml -o requirements.txt	
+	$(PIP) install -r requirements.txt
+	@echo "Dependencies installed!"
 
+# TODO: Fix this
 update: $(VENV_ACTIVATE)
-	$(POETRY) lock
-	$(POETRY) install --no-root
-	@echo Dont forget to commit the updated lock file
+	uv lock
+	uv install --no-root
+	@echo "Dependencies updated!"
+	@echo "Dont forget to commit the updated lock file"
 
 format: $(VENV_ACTIVATE)
-	$(POETRY) run ruff check --fix --exit-zero .
-	$(POETRY) run ruff format .
+	$(VENV)/bin/ruff check --fix --exit-zero .
+	$(VENV)/bin/ruff format .
+	@echo "Code formatted!"
 
-poetry-check: $(VENV_ACTIVATE)
-	$(POETRY) check
-
+# TODO: Fix this
 lint-check: $(VENV_ACTIVATE)
 	$(POETRY) run ruff check .
 
+# TODO: Fix this
 format-check: $(VENV_ACTIVATE)
 	$(POETRY) run ruff format --check .
 
+# TODO: Fix this
 type-check:
 	$(POETRY) run mypy .
 
 ## lint: Run all lint checks
+# TODO: Fix this
 lint: poetry-check lint-check format-check type-check
 
 ## unit: Run unit tests
+# TODO: Fix this
 unit: $(VENV_ACTIVATE)
 	$(POETRY) run pytest tests/unit
 
 ## unit-coverage: Run unit tests with coverage report
+# TODO: Fix this
 unit-coverage: $(VENV_ACTIVATE)
 	$(POETRY) run coverage run -m pytest tests/unit
 	$(POETRY) run coverage report
