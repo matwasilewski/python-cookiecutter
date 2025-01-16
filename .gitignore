@@ -1,2 +1,3 @@
 .idea/
 {{cookiecutter.project_name}}/.venv/
+{{cookiecutter.project_name}}.egg-info/*

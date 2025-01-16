@@ -1,7 +1,9 @@
 [project]
 name = "{{cookiecutter.project_name}}"
 version = "{{cookiecutter.version}}"
-authors = ["{{cookiecutter.version}} <{{cookiecutter.email}}>"]
+authors = [
+    {name = "{{cookiecutter.author}}", email = "{{cookiecutter.email}}"}
+]
 description = "{{cookiecutter.description}}"
 readme = "README.md"
 requires-python = ">=3.11"
