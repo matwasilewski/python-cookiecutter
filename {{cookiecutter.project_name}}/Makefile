@@ -23,8 +23,11 @@ venv: prerequisites
 	if [ ! -d .venv ]; then uv venv -p 3.11; fi
 	uv run python -m ensurepip --upgrade || true
 
-install: venv precommit-hooks
-	uv pip install -r requirements.txt #force it to install in our venv
+lock:
+	uv pip compile requirements.in > requirements.txt
+
+install: venv precommit-hooks lock
+	uv pip install -r requirements.txt
 
 precommit: precommit-hooks
 	git fetch origin
@@ -42,8 +45,6 @@ format:
 	uv run ruff check . --fix
 
 
-lock:
-	uv pip compile requirements.in > requirements.txt
 
 clean:
 	@echo "cleaning various cache locations to ensure clean installation is possible"
