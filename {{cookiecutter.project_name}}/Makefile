@@ -24,10 +24,10 @@ venv: prerequisites
 	uv run python -m ensurepip --upgrade || true
 
 lock:
-	uv pip compile requirements.in > requirements.txt
+	uv lock
 
 install: venv precommit-hooks lock
-	uv pip install -r requirements.txt
+	uv sync
 
 precommit: precommit-hooks
 	git fetch origin
@@ -43,7 +43,7 @@ full_test:
 
 format:
 	uv run ruff check . --fix
-
+	uv tool run black .
 
 
 clean:

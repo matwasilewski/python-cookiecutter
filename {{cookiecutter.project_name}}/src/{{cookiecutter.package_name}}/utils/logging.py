@@ -7,8 +7,8 @@ from typing import ClassVar, Optional
 import ujson
 from json_log_formatter import JSONFormatter
 
-from .config import settings
-from .exceptions import BadLogFormatError
+from {{cookiecutter.project_name}}.config import settings
+from {{cookiecutter.project_name}}.exceptions import BadLogFormatError
 
 GREY = "\x1b[38;21m"
 RED = "\x1b[31;21m"
