@@ -34,7 +34,7 @@ USER service
 # --- Runtime -----------------------------------------------------------------
 # Replace the placeholder below with your actual entrypoint, e.g.:
 # CMD ["uv", "run", "python", "-m", "my_project.cli"]
-CMD ["uv", "run", "python", "-m", "your_package"]
+CMD ["uv", "run", "python", "-m", "{{cookiecutter.project_name}}"]
 # FIXME: change the module above to your actual application entrypoint
 
 
