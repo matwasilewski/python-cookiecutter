@@ -1,40 +1,9 @@
 import time
 from functools import lru_cache
-from importlib import metadata
 from pathlib import Path
-from typing import Dict, Optional, Union
-import tomlkit
+from typing import Optional, Union
 
 from pydantic_settings import BaseSettings
-
-
-def _get_project_meta(name: str = "unknown") -> Dict:
-    """
-    Get name and version from pyproject metadata.
-    """
-    version = "unknown"
-    description = ""
-    try:
-        with Path("./pyproject.toml").open() as pyproject:
-            file_contents = pyproject.read()
-        parsed = dict(tomlkit.parse(file_contents))["project"]
-        name = parsed["name"]
-        version = parsed.get("version", "unknown")
-        description = parsed.get("description", "")
-    except FileNotFoundError:
-        # If cannot read the contents of pyproject directly (i.e. in Docker),
-        # check installed package using importlib.metadata:
-        try:
-            dist = metadata.distribution(name)
-            name = dist.metadata["Name"]
-            version = dist.version
-            description = dist.metadata.get("Summary", "")
-        except metadata.PackageNotFoundError:
-            pass
-    return {"name": name, "version": version, "description": description}
-
-
-PKG_META = _get_project_meta()
 
 
 class Settings(BaseSettings):
@@ -44,12 +13,6 @@ class Settings(BaseSettings):
     """
 
     current_timestamp: int = int(time.time())
-
-    # Meta
-    APP_NAME: str = str(PKG_META["name"])
-    APP_VERSION: str = str(PKG_META["version"])
-    PUBLIC_NAME: str = APP_NAME
-    DESCRIPTION: str = str(PKG_META["description"])
 
     # Logger
     LOGGER_NAME: str = "{{cookiecutter.package_name}}"

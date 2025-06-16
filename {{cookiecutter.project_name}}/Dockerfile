@@ -1,29 +1,40 @@
-FROM python:3.9-slim
+FROM python:3.11-slim AS base
 
-# copy requirements files
+# Install the `uv` package manager (static binary)
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Establish application directory
 WORKDIR /app
-COPY ./pyproject.toml ./poetry.lock /app/
 
-# generate requirements.txt using poetry
-RUN pip install --upgrade pip
-RUN pip install poetry
-RUN poetry export -f requirements.txt --output requirements.txt
+# Copy dependency definitions first (for better Docker layer caching)
+COPY ./pyproject.toml ./uv.lock* /app/
 
-# set up service account
+# Allow an alternative package repository to be provided at build time
+ARG PACKAGE_REPO_URL
+
+# Install project dependencies (production only)
+#   --no-editable : install the project as a wheel, not editable
+#   --no-dev      : skip dev / test dependencies to keep image slim
+RUN if [ -n "$PACKAGE_REPO_URL" ]; then \
+    uv sync --no-editable --no-dev --extra-index-url "$PACKAGE_REPO_URL"; \
+    else \
+    uv sync --no-editable --no-dev; \
+    fi
+
+# Ensure the environment executables are discoverable
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Copy the remainder of the source code
+COPY . /app
+
+# Drop privileges for runtime security
 RUN useradd -ms /bin/bash service
 USER service
 
-# allow the package repo URL to be passed in as an arg
-ARG PACKAGE_REPO_URL
-
-# install requirements
-RUN pip install -r requirements.txt --extra-index-url $PACKAGE_REPO_URL
-
-# copy the rest of the source code
-COPY . /app
-
-# run uvicorn
-CMD poetry show
-# FIXME: run CMD here...
+# --- Runtime -----------------------------------------------------------------
+# Replace the placeholder below with your actual entrypoint, e.g.:
+# CMD ["uv", "run", "python", "-m", "my_project.cli"]
+CMD ["uv", "run", "python", "-m", "your_package"]
+# FIXME: change the module above to your actual application entrypoint
 
 
