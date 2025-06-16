@@ -6,7 +6,7 @@ authors = [
 ]
 description = "{{cookiecutter.description}}"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
     "pytest",
     "pydantic_settings",
